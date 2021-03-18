@@ -21,7 +21,7 @@ pub use handle::Handle;
 #[cfg(feature = "legacy-runtime")]
 pub use object::Class;
 pub use object::Object;
-pub use result::{JsResult, JsResultExt, NeonResult};
+pub use result::{JsResult, JsResultExt, NeonResult, ResultExt};
 #[cfg(feature = "legacy-runtime")]
 pub use task::Task;
 pub use types::{

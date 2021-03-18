@@ -1,5 +1,8 @@
 //! Node _execution contexts_, which manage access to the JavaScript engine at various points in the Node.js runtime lifecycle.
 
+#[cfg(all(feature = "napi-1", feature = "serde"))]
+use serde_crate::{Deserialize, Serialize};
+
 pub(crate) mod internal;
 
 use borrow::internal::Ledger;
@@ -13,6 +16,8 @@ use neon_runtime::raw;
 #[cfg(feature = "legacy-runtime")]
 use object::class::Class;
 use object::{Object, This};
+#[cfg(all(feature = "napi-1", feature = "serde"))]
+use result::SerdeError;
 use result::{JsResult, NeonResult, Throw};
 #[cfg(feature = "napi-1")]
 use smallvec::SmallVec;
@@ -403,6 +408,27 @@ pub trait Context<'a>: ContextInternal<'a> {
     /// Creates an unbounded queue of events to be executed on a JavaScript thread
     fn queue(&mut self) -> EventQueue {
         EventQueue::new(self)
+    }
+
+    #[cfg(all(feature = "napi-1", feature = "serde"))]
+    #[allow(clippy::wrong_self_convention)]
+    /// Attempt to write a struct into a JavaScript value using the serde::ser::Serialize implementation
+    fn to_js_value<T: ?Sized>(&mut self, v: &T) -> Result<Handle<'a, JsValue>, SerdeError>
+    where
+        T: Serialize,
+    {
+        let result = unsafe { neon_runtime::serde::to_value(self.env().to_raw(), v) };
+
+        result.map(JsValue::new_internal)
+    }
+
+    #[cfg(all(feature = "napi-1", feature = "serde"))]
+    /// Attempt to read a struct into a JavaScript value using the serde::de::Deserialize implementation
+    fn from_js_value<T: ?Sized, U: Value>(&mut self, v: Handle<U>) -> Result<T, SerdeError>
+    where
+        T: Deserialize<'static>,
+    {
+        unsafe { neon_runtime::serde::from_value(self.env().to_raw(), v.to_raw()) }
     }
 }
 

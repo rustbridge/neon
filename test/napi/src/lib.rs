@@ -9,6 +9,7 @@ mod js {
     pub mod functions;
     pub mod numbers;
     pub mod objects;
+    pub mod serde;
     pub mod strings;
     pub mod threads;
     pub mod types;
@@ -22,6 +23,7 @@ use js::errors::*;
 use js::functions::*;
 use js::numbers::*;
 use js::objects::*;
+use js::serde::*;
 use js::strings::*;
 use js::threads::*;
 use js::types::*;
@@ -256,6 +258,9 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("greeter_new", greeter_new)?;
     cx.export_function("greeter_greet", greeter_greet)?;
     cx.export_function("leak_event_queue", leak_event_queue)?;
+
+    cx.export_function("parse_pokedex", parse_pokedex)?;
+    cx.export_function("stringify_pokedex", stringify_pokedex)?;
 
     Ok(())
 }

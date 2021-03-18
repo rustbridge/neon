@@ -200,6 +200,17 @@ mod napi1 {
     );
 }
 
+#[cfg(feature = "serde")]
+mod napi1_serde {
+    use super::super::types::*;
+
+    generate!(
+        extern "C" {
+            fn get_property_names(env: Env, object: Value, result: *mut Value) -> Status;
+        }
+    );
+}
+
 #[cfg(feature = "napi-4")]
 mod napi4 {
     use super::super::types::*;
@@ -273,6 +284,8 @@ mod napi6 {
 }
 
 pub(crate) use napi1::*;
+#[cfg(feature = "serde")]
+pub(crate) use napi1_serde::*;
 #[cfg(feature = "napi-4")]
 pub(crate) use napi4::*;
 #[cfg(feature = "napi-5")]
@@ -303,6 +316,9 @@ pub(crate) unsafe fn load(env: Env) -> Result<(), libloading::Error> {
     let version = get_version(&host, env).expect("Failed to find N-API version");
 
     napi1::load(&host, version, 1)?;
+
+    #[cfg(feature = "serde")]
+    napi1_serde::load(&host, version, 1)?;
 
     #[cfg(feature = "napi-4")]
     napi4::load(&host, version, 4)?;

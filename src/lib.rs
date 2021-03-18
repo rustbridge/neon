@@ -3,6 +3,8 @@
 extern crate cslice;
 extern crate neon_runtime;
 extern crate semver;
+#[cfg(all(feature = "napi-1", feature = "serde"))]
+extern crate serde_crate;
 extern crate smallvec;
 
 #[cfg(feature = "proc-macros")]

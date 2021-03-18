@@ -168,7 +168,8 @@ impl<T: Send + 'static> ThreadsafeFunction<T> {
 impl<T> Drop for ThreadsafeFunction<T> {
     fn drop(&mut self) {
         unsafe {
-            napi::release_threadsafe_function(
+            // Status is ignored because cannot take any action if there was an error
+            let _ = napi::release_threadsafe_function(
                 self.tsfn.0,
                 napi::ThreadsafeFunctionReleaseMode::Release,
             );

@@ -9,8 +9,10 @@ edition = "2018"
 
 [dependencies]
 cfg-if = "1.0.0"
+conv = { version = "0.3", optional = true }
 libloading = { version = "0.6.5", optional = true }
 neon-sys = { version = "=0.7.1", path = "../neon-sys", optional = true }
+serde_crate = { package = "serde", version = "1", optional = true }
 smallvec = "1.4.2"
 
 [dev-dependencies]
@@ -25,6 +27,7 @@ napi-4 = ["napi-3"]
 napi-5 = ["napi-4"]
 napi-6 = ["napi-5"]
 napi-experimental = ["napi-6"]
+serde = ["serde_crate", "conv"]
 docs-only = ["neon-sys/docs-only"]
 
 [package.metadata.docs.rs]

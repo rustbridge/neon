@@ -1,5 +1,8 @@
 //! Types and traits for working with JavaScript exceptions.
 
+#[cfg(all(feature = "napi-1", feature = "serde"))]
+pub use neon_runtime::serde::Error as SerdeError;
+
 use context::Context;
 use handle::Handle;
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -30,4 +33,26 @@ pub type JsResult<'b, T> = NeonResult<Handle<'b, T>>;
 /// exception in the error case.
 pub trait JsResultExt<'a, V: Value> {
     fn or_throw<'b, C: Context<'b>>(self, cx: &mut C) -> JsResult<'a, V>;
+}
+
+/// An extension trait for `Result` values that can be converted into `NeonResult` values by throwing a JavaScript
+/// exception in the error case.
+pub trait ResultExt<T> {
+    fn or_throw<'a, C: Context<'a>>(self, cx: &mut C) -> NeonResult<T>;
+}
+
+#[cfg(all(feature = "napi-1", feature = "serde"))]
+impl<T> ResultExt<T> for Result<T, SerdeError> {
+    fn or_throw<'a, C: Context<'a>>(self, cx: &mut C) -> NeonResult<T> {
+        let err = match self {
+            Ok(v) => return Ok(v),
+            Err(err) => err,
+        };
+
+        if err.is_exception_pending() {
+            Err(Throw)
+        } else {
+            cx.throw_error(err.to_string())
+        }
+    }
 }

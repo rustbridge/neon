@@ -69,6 +69,7 @@ pub type ThreadsafeFunctionCallJs = Option<
 
 #[allow(dead_code)]
 #[repr(u32)]
+#[must_use]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Status {
     Ok = 0,

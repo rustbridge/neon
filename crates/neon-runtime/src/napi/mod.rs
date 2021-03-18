@@ -19,5 +19,8 @@ pub mod tag;
 #[cfg(feature = "napi-4")]
 pub mod tsfn;
 
+#[cfg(feature = "serde")]
+pub mod serde;
+
 mod bindings;
 pub use bindings::*;
